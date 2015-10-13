@@ -40,19 +40,22 @@ If you have any questions, please send Saul a message through Slack (http://baiz
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
         <title>GETTING STARTED WITH BRACKETS</title>
         <meta name="description" content="An interactive getting started guide for Brackets.">
+
     </head>
         <script>
         //05
-        function replace (h3text) {
-            var newh3text = 
-        }    
+        function h3text (input) {
+            document.write("<h3>"+input+"</h3>");
+        }
     </script>
+
     <script>
-        //05
-        function replace (h3text) {
-            var newh3text = 
-        }    
-</script>
+        //05 version 2 
+        function h3text (input) {
+            var input = getElementbyId("h3");
+            document.write("<h3>"+input+"</h3>");
+        }
+    </script>
 
     <body>
         
@@ -104,7 +107,12 @@ If you have any questions, please send Saul a message through Slack (http://baiz
             GET STARTED WITH YOUR OWN FILES
         -->
         
-        <h3>Projects in Brackets</h3>
+
+        <script>
+        h3text("Project in Brackets");
+        </script>
+
+        
         <p>
             In order to edit your own code using Brackets, you can just open the folder containing your files.
             Brackets treats the currently open folder as a "project"; features like Code Hints, Live Preview and
@@ -238,7 +246,7 @@ If you have any questions, please send Saul a message through Slack (http://baiz
             something you need that Brackets doesn't offer, more than likely someone has built an extension for
             it. To browse or search the list of available extensions, choose <strong>File &gt; Extension
             Manager</strong> and click on the "Available" tab. When you find an extension you want, just click
-            the "Install" button next to it.
+            the "Install" button next to it.' 
         </p>
         
         <!--
@@ -277,13 +285,22 @@ If you have any questions, please send Saul a message through Slack (http://baiz
             <li>Chat with Brackets developers on IRC in <a href="http://webchat.freenode.net/?channels=brackets&uio=d4">#brackets on Freenode</a></li>
         </ul>
 
+        <script> 
+                //08
+                function AlertwURL() {
+                    alert(window.location.href);
+                }
+        </script>  
     <p>
-        <a href= 
-           <script> 
-                var URL = alert(window.location.href);
-                document.write(URL);
-            </script>     
-        Click me to see current URL!</a>
+        
+        <a href="#" onclick = "AlertwURL();return false;">Click Me!</a>
+              
    </p> 
+
+   <script src = "random.js" type = "text/javascript">
+   //09
+   document.write(randomfruit);
+
+   </script>
     </body>
 </html>
