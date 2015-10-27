@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"> 
+    <head>
+        <meta charset="utf-8">
+        <title>d3 blank page</title>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+
+    </head>
+    <body>
+        <script type="text/javascript">
+            var dataset;      
+
+            d3.csv ( "data.csv", function ( error, data ) {
+            
+              if ( error ) {
+                console.log("There was an error.")
+              } else {
+                dataset = data; 
+              }                 
+
+            d3
+              .select("body")
+              .selectAll("div") 
+              .data(dataset)
+              .enter()
+              .append("div")
+              .attr("class","bar")
+              .style("height", function(d) {
+                var barHeight = d * 5 
+                return barHeight + "px";
+
+              });
+
+        </script>
+    </body>
+</html>

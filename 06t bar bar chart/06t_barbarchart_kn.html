@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>d3 blank page</title>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+          <style>
+            body {
+              background-color: gray;
+            }
+
+            svg {
+              background-color: white;
+            }
+
+            .axis path,
+            .axis line {
+              fill: none;
+              stroke: black;
+              shape-rendering: crispEdges;
+            }
+            .axis text {
+              font: 10px Arial;
+            }
+
+          </style>
+    </head>
+    <body>
+        <script type="text/javascript">
+
+//width / height
+            var w = 600;
+            var h = 250;
+            var padding = 25;
+
+            var dataset;
+
+// CSV data
+            d3.csv ( "bars.csv", function ( error, data ) {
+
+              if ( error ) {
+                console.log("There was an error.")
+              } else {
+                dataset = data;
+              }
+
+//x and y scale functions
+            var xScale = d3.scale.ordinal()
+              .domain(d3 range(dataset.length))
+              .rangeRoundBands([padding, w - padding], 0.05);
+
+
+
+// bind data to bars
+            d3
+              .select("body")
+              .selectAll("div")
+              .data(dataset)
+              .enter()
+              .append("div")
+              .attr("class","bar")
+              .style("height", function(d) {
+                var barHeight = d * 5
+                return barHeight + "px";
+
+              });
+
+
+// scale
+
+// define x-axis - Bars
+
+var x = d3.scale.ordinal()
+  .domain([])
+  .rangePoints([0,width])
+
+
+
+var xAxis = d3.svg.axis()
+              .scale(xScale)
+              .orient("bottom")
+              .ticks(5);
+
+// define y-axis - Rating
+
+
+
+var xAxis = d3.svg.axis()
+              .scale(yScale)
+              .orient("left")
+              .ticks(5);
+
+}
+
+// generate axes
+  var axis = d3.svg.axis()
+    .scale(scale);
+
+  svg.append("g")
+    .call(axis);
+
+
+        </script>
+    </body>
+</html>
