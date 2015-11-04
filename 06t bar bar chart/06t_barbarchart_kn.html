@@ -1,3 +1,9 @@
+<!-- TODO: x axis
+TODO: value labels
+TODO: x and y axis labels
+TODO: titles
+TODO: other data -->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -5,8 +11,14 @@
         <title>d3 blank page</title>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
           <style>
+            p {
+              font: 10px Garamond
+            }
             body {
               background-color: #eee;
+            }
+            h1 {
+              font: 20px Garamond
             }
             svg {
               background-color: white;
@@ -14,52 +26,61 @@
             .axis path,
             .axis line {
               fill: none;
-              stroke: black;
+              stroke: #000;
               shape-rendering: crispEdges;
             }
-            .axis text {
-              font: 10px Arial;
+
+            .x.axis path {
+              display: none;
             }
+
           </style>
     </head>
+    <h1>Bars of Boston</h1>
     <body>
         <script type="text/javascript">
 
 //width / height
             var width = 600;
-            var height = 400;
+            var height = 250;
             var padding = 25;
             var dataset;
+            // why create var dataset here?
 
 // CSV data
-            d3.csv ( "bars.csv", function ( error, data ) {
+          d3.csv ( "bars.csv", function ( error, data ) {
 
                 if ( error ) {
                     console.log ( "There was an error." ) ;
                 } else {
                     dataset = data ;
-                    draw_data_viz () ;
+                    barviz () ;
                 }
             }) ;
 
 // bind data to bars
-    function draw_data_viz ( ) {
+    function barviz ( ) {
         var scale_multiplier = 20 ;
-        var bar_padding = 2 ;
+        var bar_padding = .5 ;
+        var text_padding = 10 ;
 
         //x scale functions
         var xScale = d3.scale.ordinal()
                 .domain(d3.range(dataset.length))
                 .rangeRoundBands([padding, width - padding], 0.05);
 
+        var yScale = d3.scale.linear()
+                .domain([0, d3.max(dataset, function(data) { return data; })])
+                .range([0,10])
+
         var svg = d3.select("body")
                 .append("svg")
                 .attr("width", width )
                 .attr("height", height );
 
-
-        d3
-                .select("svg")
+        //d3 bars
+        var bar =
+              d3.select("svg")
                 .selectAll("rect")
                 .data(dataset)
                 .enter()
@@ -74,54 +95,50 @@
                 })
                 .attr("fill","purple")// FIXME: change to something else
                 .attr("x", function ( data, index ) {
-                    return index*(width / dataset.length ) ;
+                    return index * (width / dataset.length ) ;
                 })
                 .attr("y", function ( data ) {
                     return height - (data.Rating * scale_multiplier) ;
 
                 }) ;
 
+        //text lb
+        svg.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .text(function(data) {
+                  return data.Rating
+                } )
+                .attr("fill","white")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "6px")
+                .attr("x",function (data, index) {
+                  return index * (width / dataset.length) + text_padding ;
+                })
+                .attr("y", function ( data ) {
+                    return height - (data.Rating * scale_multiplier) + text_padding ;
+                })
+                .attr("text-anchor","middle");}
 
-//                .style("height", function (d) {
-//                    var barHeight = d * 5;
-//                    return barHeight + "px";
-//                });
-    }
+              gh 
+          //x axis
+            var xAxis = d3.svg.axis()
+              .scale(xScale)
+              .orient("bottom");
+
+            svg.append("g")
+                .call(xAxis);
+
+            //x axis label
+            svg.append("text")
+              .attr("class", "x label")
+              .attr("text-anchor", "end")
+              .attr("x", width)
+              .attr("y", height - 6)
+              .text("Bar");
 
 
-//
-//// scale
-//
-//// define x-axis - Bars
-//
-//var x = d3.scale.ordinal()
-//  .domain([])
-//  .rangePoints([0,width])
-//
-//
-//
-//var xAxis = d3.svg.axis()
-//              .scale(xScale)
-//              .orient("bottom")
-//              .ticks(5);
-//
-//// define y-axis - Rating
-//
-//
-//
-//var xAxis = d3.svg.axis()
-//              .scale(yScale)
-//              .orient("left")
-//              .ticks(5);
-//
-//}
-//
-//// generate axes
-//  var axis = d3.svg.axis()
-//    .scale(scale);
-//
-//  svg.append("g")
-//    .call(axis);
 
         </script>
     </body>
