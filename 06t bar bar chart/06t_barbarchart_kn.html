@@ -30,8 +30,9 @@ TODO: other data -->
               shape-rendering: crispEdges;
             }
 
-            .axis path, {
-              display: none;
+            .axis {
+              font-family: helvetica;
+              font-size: 7px;
             }
 
             .x_label {
@@ -72,21 +73,20 @@ TODO: other data -->
         var scale_multiplier = 20;
         var bar_padding = .5;
         var text_padding = 10;
+        var lowest_rating = 0;
+        var highest_rating = 10;
+        var offset = 20;
 
         //x scale functions
-        var xScale = d3.scale.ordinal()
-                .domain(d3.range(dataset.length))
-            // SRB: the line below was edited.
-                .rangeRoundBands([0, width], 0.05);
+        // var xScale = d3.scale.ordinal()
+        //         .domain(d3.range(dataset.length))
+        //     // SRB: the line below was edited.
+        //         .rangeRoundBands([0, width], 0.05);
 
         var yScale = d3.scale.linear()
+                .domain([highest_rating,lowest_rating])
+                .range([offset,(height-offset)]);
 
-                .domain([0, d3.max(dataset, function (data) {
-                    return data[1];
-                })])
-                // KN - Is the above correct? Or can I make it static since I know the ratings will always be out of 10?
-                // .domain([0,10])
-                .range([0, 10]);
 
         var svg = d3.select("body")
                 .append("svg")
@@ -101,11 +101,16 @@ TODO: other data -->
                         .enter()
                         .append("rect")
                         .attr("class", "bar")
-                        .style("height", function (data) {
+                        .attr("height", function (data , index) {
                             // console.log ( data ) ;
-                            return data.Rating * scale_multiplier;
+                            // return data.Rating * scale_multiplier;
+                            console.log("data.Rating "+index+": " +data.Rating);
+                            console.log("yScale(data.Rating) "+index+": " +yScale(data.Rating));
+                            console.log("height - yScale(data.Rating)-offset "+index+": " +(height - yScale(data.Rating)-offset));
+                            return height - yScale(data.Rating) - offset;
+
                         })
-                        .style("width", function () {
+                        .attr("width", function () {
                             return ( width / dataset.length ) - bar_padding;
                         })
                         .attr("fill", "purple")// FIXME: change to something else
@@ -113,7 +118,9 @@ TODO: other data -->
                             return index * (width / dataset.length );
                         })
                         .attr("y", function (data) {
-                            return height - (data.Rating * scale_multiplier);
+                            // return height - (data.Rating * scale_multiplier) - (offset);
+                            // return yScale(data.Rating) - offset - (height - offset);
+                            return (height-offset) - (height - yScale(data.Rating) - offset);
                         });
 
         //text lb
@@ -146,30 +153,30 @@ TODO: other data -->
         //         .attr("font-family","sans-serif")
         //         .attr("font-size","10px")
         //         .attr("transform","rotate(45)")
-        //x axis
-        var xAxis = d3.svg.axis()
-                .scale(xScale)
-                .orient("bottom") ;
-
-        svg.append("g")
-                .attr("class", "axis")
-                .attr("transform","translate(0,"+ (height-padding)+")")
-                .call(xAxis);
-
-
-        // SRB: the curly brace below was not in the correct place, and therefore the axis was not showing up.
-    }
-        //y axis
-
+        // //x axis
+        // var xAxis = d3.svg.axis()
+        //         .scale(xScale)
+        //         .orient("bottom") ;
+        //
+        // svg.append("g")
+        //         .attr("class", "axis")
+        //         .attr("transform","translate(0,"+ (height-padding)+")")
+        //         .call(xAxis);
         var yAxis = d3.svg.axis()
                 .scale(yScale)
                 .orient("left")
-                .ticks(10);
+                .ticks(11);
 
         svg.append("g")
                 .attr("class","axis")
                 .attr("transform","translate("+ padding + ",0)")
                 .call(yAxis);
+
+        // SRB: the curly brace below was not in the correct place, and therefore the axis was not showing up.
+    }
+        //y axis
+
+
 
         </script>
     </body>
