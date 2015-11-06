@@ -30,13 +30,16 @@ TODO: other data -->
               shape-rendering: crispEdges;
             }
 
-            .axis path {
+            .axis path, {
               display: none;
             }
 
             .x_label {
                 font-family: "Arial", sans-serif;
 
+            .y_label {
+
+            }
             }
 
           </style>
@@ -48,7 +51,7 @@ TODO: other data -->
 //width / height
             var width = 600;
             var height = 250;
-            var padding = 25;
+            var padding = 30;
             var dataset;
             // why create var dataset here?
             // SRB: it's a global variable and therefore can be accessed from within any function.
@@ -77,10 +80,13 @@ TODO: other data -->
                 .rangeRoundBands([0, width], 0.05);
 
         var yScale = d3.scale.linear()
+
                 .domain([0, d3.max(dataset, function (data) {
-                    return data;
+                    return data[1];
                 })])
-                .range([0, 10])
+                // KN - Is the above correct? Or can I make it static since I know the ratings will always be out of 10?
+                // .domain([0,10])
+                .range([0, 10]);
 
         var svg = d3.select("body")
                 .append("svg")
@@ -129,18 +135,17 @@ TODO: other data -->
                 })
                 .attr("text-anchor", "middle");
 
-        // The code below isn't actually doing anything, so I commented it out.
-/*
-        //x axis label
-        svg.append("text")
-                .attr("class", "x label")
-                .attr("text-anchor", "end")
-                .attr("x", width)
-                .attr("y", height - 6)
-                .text("Bar");
-*/
-        // SRB: I commented out the line below since it was gibberish.
-        //gh
+        //bar name lables
+        // svg.select("text")
+        //         .data(dataset)
+        //         .append("text")
+        //         .text(function (data) {
+        //             return data.Bar
+        //         })
+        //         .attr("fill","black")
+        //         .attr("font-family","sans-serif")
+        //         .attr("font-size","10px")
+        //         .attr("transform","rotate(45)")
         //x axis
         var xAxis = d3.svg.axis()
                 .scale(xScale)
@@ -148,9 +153,23 @@ TODO: other data -->
 
         svg.append("g")
                 .attr("class", "axis")
+                .attr("transform","translate(0,"+ (height-padding)+")")
                 .call(xAxis);
+
+
         // SRB: the curly brace below was not in the correct place, and therefore the axis was not showing up.
     }
+        //y axis
+
+        var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left")
+                .ticks(10);
+
+        svg.append("g")
+                .attr("class","axis")
+                .attr("transform","translate("+ padding + ",0)")
+                .call(yAxis);
 
         </script>
     </body>
