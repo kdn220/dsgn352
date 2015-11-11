@@ -1,8 +1,8 @@
-<!-- TODO: x axis
-TODO: value labels
+<!-- TODO: bar names on x-axis
 TODO: x and y axis labels
-TODO: titles
-TODO: other data -->
+TODO: add padding around SVG to align axis and bars
+TODO: 
+ -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -70,6 +70,7 @@ TODO: other data -->
 
 // bind data to bars
     function barviz ( ) {
+        var margin = {top: 20, right: 30, bottom: 30, left: 40}
         var scale_multiplier = 20;
         var bar_padding = .5;
         var text_padding = 10;
@@ -78,10 +79,9 @@ TODO: other data -->
         var offset = 20;
 
         //x scale functions
-        // var xScale = d3.scale.ordinal()
-        //         .domain(d3.range(dataset.length))
-        //     // SRB: the line below was edited.
-        //         .rangeRoundBands([0, width], 0.05);
+        var xScale = d3.scale.ordinal()
+            .domain(d3.range(dataset.length))
+
 
         var yScale = d3.scale.linear()
                 .domain([highest_rating,lowest_rating])
@@ -91,7 +91,8 @@ TODO: other data -->
         var svg = d3.select("body")
                 .append("svg")
                 .attr("width", width)
-                .attr("height", height);
+                .attr("height", height)
+
 
         //d3 bars
         var bar =
@@ -115,13 +116,14 @@ TODO: other data -->
                         })
                         .attr("fill", "purple")// FIXME: change to something else
                         .attr("x", function (data, index) {
-                            return index * (width / dataset.length );
+                            return index * (width / (dataset.length) );
                         })
                         .attr("y", function (data) {
                             // return height - (data.Rating * scale_multiplier) - (offset);
                             // return yScale(data.Rating) - offset - (height - offset);
                             return (height-offset) - (height - yScale(data.Rating) - offset);
-                        });
+                        })
+
 
         //text lb
         svg.selectAll("text")
@@ -141,6 +143,7 @@ TODO: other data -->
                     return height - (data.Rating * scale_multiplier) + text_padding;
                 })
                 .attr("text-anchor", "middle");
+
 
         //bar name lables
         // svg.select("text")
