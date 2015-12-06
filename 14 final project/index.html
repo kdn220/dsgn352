@@ -1,0 +1,186 @@
+<!-- TODO: bar names on x-axis
+TODO: x and y axis labels
+TODO: add padding around SVG to align axis and bars
+TODO:
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>d3 bar chart</title>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
+          <style>
+            p {
+              font: 10px Garamond
+            }
+            body {
+              background-color: #eee;
+            }
+            h1 {
+              font: 20px Garamond
+            }
+            svg {
+              background-color: white;
+            }
+            .axis path,
+            .axis line {
+              fill: none;
+              stroke: #000;
+              shape-rendering: crispEdges;
+            }
+
+            .axis {
+              font-family: helvetica;
+              font-size: 7px;
+            }
+
+            .x_label {
+                font-family: "Arial", sans-serif;
+
+            .y_label {
+
+            }
+            }
+
+          </style>
+    </head>
+    <h1>Bars of Boston</h1>
+    <body>
+        <script type="text/javascript">
+
+//width / height
+            var width = 600;
+            var height = 250;
+            var padding = 30;
+            var dataset;
+            // why create var dataset here?
+            // SRB: it's a global variable and therefore can be accessed from within any function.
+
+// CSV data
+          d3.csv ( "bars.csv", function ( error, data ) {
+
+                if ( error ) {
+                    console.log ( "There was an error." ) ;
+                } else {
+                    dataset = data ;
+                    barviz () ;
+                }
+            }) ;
+
+// bind data to bars
+    function barviz ( ) {
+        var margin = {top: 20, right: 30, bottom: 30, left: 40}
+        var scale_multiplier = 20;
+        var bar_padding = .5;
+        var text_padding = 10;
+        var lowest_rating = 0;
+        var highest_rating = 10;
+        var offset = 20;
+
+        //x scale functions
+        var xScale = d3.scale.ordinal()
+            .domain(d3.range(dataset.length))
+
+
+        var yScale = d3.scale.linear()
+                .domain([highest_rating,lowest_rating])
+                .range([offset,(height-offset)]);
+
+
+        var svg = d3.select("body")
+                .append("svg")
+                .attr("width", width)
+                .attr("height", height)
+
+
+        //d3 bars
+        var bar =
+                d3.select("svg")
+                        .selectAll("rect")
+                        .data(dataset)
+                        .enter()
+                        .append("rect")
+                        .attr("class", "bar")
+                        .attr("height", function (data , index) {
+                            // console.log ( data ) ;
+                            // return data.Rating * scale_multiplier;
+                            console.log("data.Rating "+index+": " +data.Rating);
+                            console.log("yScale(data.Rating) "+index+": " +yScale(data.Rating));
+                            console.log("height - yScale(data.Rating)-offset "+index+": " +(height - yScale(data.Rating)-offset));
+                            return height - yScale(data.Rating) - offset;
+
+                        })
+                        .attr("width", function () {
+                            return ( width / dataset.length ) - bar_padding;
+                        })
+                        .attr("fill", "purple")// FIXME: change to something else
+                        .attr("x", function (data, index) {
+                            return index * (width / (dataset.length) );
+                        })
+                        .attr("y", function (data) {
+                            // return height - (data.Rating * scale_multiplier) - (offset);
+                            // return yScale(data.Rating) - offset - (height - offset);
+                            return (height-offset) - (height - yScale(data.Rating) - offset);
+                        })
+
+
+        //text lb
+        svg.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .text(function (data) {
+                    return data.Rating
+                })
+                .attr("fill", "white")
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "6px")
+                .attr("x", function (data, index) {
+                    return index * (width / dataset.length) + text_padding;
+                })
+                .attr("y", function (data) {
+                    return height - (data.Rating * scale_multiplier) + text_padding;
+                })
+                .attr("text-anchor", "middle");
+
+
+        //bar name lables
+        // svg.select("text")
+        //         .data(dataset)
+        //         .append("text")
+        //         .text(function (data) {
+        //             return data.Bar
+        //         })
+        //         .attr("fill","black")
+        //         .attr("font-family","sans-serif")
+        //         .attr("font-size","10px")
+        //         .attr("transform","rotate(45)")
+        // //x axis
+        // var xAxis = d3.svg.axis()
+        //         .scale(xScale)
+        //         .orient("bottom") ;
+        //
+        // svg.append("g")
+        //         .attr("class", "axis")
+        //         .attr("transform","translate(0,"+ (height-padding)+")")
+        //         .call(xAxis);
+        var yAxis = d3.svg.axis()
+                .scale(yScale)
+                .orient("left")
+                .ticks(11);
+
+        svg.append("g")
+                .attr("class","axis")
+                .attr("transform","translate("+ padding + ",0)")
+                .call(yAxis);
+
+        // SRB: the curly brace below was not in the correct place, and therefore the axis was not showing up.
+    }
+        //y axis
+
+
+
+        </script>
+    </body>
+</html>
