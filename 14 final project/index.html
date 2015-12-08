@@ -1,186 +1,243 @@
-<!-- TODO: bar names on x-axis
-TODO: x and y axis labels
-TODO: add padding around SVG to align axis and bars
-TODO:
- -->
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
         <title>d3 bar chart</title>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
-          <style>
-            p {
-              font: 10px Garamond
-            }
-            body {
-              background-color: #eee;
-            }
-            h1 {
-              font: 20px Garamond
-            }
-            svg {
-              background-color: white;
-            }
-            .axis path,
-            .axis line {
-              fill: none;
-              stroke: #000;
-              shape-rendering: crispEdges;
-            }
-
-            .axis {
-              font-family: helvetica;
-              font-size: 7px;
-            }
-
-            .x_label {
-                font-family: "Arial", sans-serif;
-
-            .y_label {
-
-            }
-            }
-
-          </style>
+          <link rel="stylesheet" type="text/css" href="style.css">
     </head>
-    <h1>Bars of Boston</h1>
+    <h1 id="title">Gleaners<br/>Archive</h1>
     <body>
-        <script type="text/javascript">
+        <ul id="nav">
+        <li><a href="index.html">Meetings</a></li>
+        <li><a href="#">Potlucks</a></li>
+        <li><a href="#">Stories</a></li>
+      </ul>
 
-//width / height
-            var width = 600;
-            var height = 250;
-            var padding = 30;
-            var dataset;
-            // why create var dataset here?
-            // SRB: it's a global variable and therefore can be accessed from within any function.
+      <ul>
+          <li><a href="#">Home</a></li>
+      </ul>
+      <script type="text/javascript">
+      //
+      var w = 1000;
+      var h = 800;
 
-// CSV data
-          d3.csv ( "bars.csv", function ( error, data ) {
+      //Data
+      var dataset = {
+        nodes: [
+          { name : "Jim" },
+          { name : "Andrew" },
+          { name : "Katie" },
+          { name : "Alison" },
+          { name : "Ross" },
+          { name : "Gabriel" },
+          { name : "Jon S" },
+          { name : "Insia" },
+          { name : "Emily" },
+          { name : "Kris" }
+        ],
+        edges: [
+          { source: 0, target: 1},
+          { source: 0, target: 2},
+          { source: 0, target: 3},
+          { source: 3, target: 4},
+          { source: 3, target: 5},
+          { source: 3, target: 6},
+          { source: 7, target: 8},
+          { source: 7, target: 9},
+          { source: 9, target: 1},
+          { source: 9, target: 2},
+          { source: 9, target: 3},
+          { source: 9, target: 4},
+          { source: 9, target: 5},
+          { source: 9, target: 6},
+        ]
+      };
 
-                if ( error ) {
-                    console.log ( "There was an error." ) ;
-                } else {
-                    dataset = data ;
-                    barviz () ;
-                }
-            }) ;
+      //init default force layout
+      var force = d3.layout.force()
+        .nodes(dataset.nodes)
+        .links(dataset.edges)
+        .size([w,h])
+        .linkDistance([100])
+        .charge([-600])
+        .start();
 
-// bind data to bars
-    function barviz ( ) {
-        var margin = {top: 20, right: 30, bottom: 30, left: 40}
-        var scale_multiplier = 20;
-        var bar_padding = .5;
-        var text_padding = 10;
-        var lowest_rating = 0;
-        var highest_rating = 10;
-        var offset = 20;
+      //Easy colors
+      var colors = d3.scale.category20();
 
-        //x scale functions
-        var xScale = d3.scale.ordinal()
-            .domain(d3.range(dataset.length))
+      //create SVG element
+      var svg = d3.select("body")
+        .append("svg")
+        .attr("width",w)
+        .attr("height",h);
 
+      //create edges as lines
+      var edges = svg.selectAll("line")
+        .data(dataset.edges)
+        .enter()
+        .append("line")
+        .style("stroke","#ccc")
+        .style("stroke-width",2);
 
-        var yScale = d3.scale.linear()
-                .domain([highest_rating,lowest_rating])
-                .range([offset,(height-offset)]);
+      //create nodes as circles
+      var nodes = svg.selectAll("circle")
+        .data(dataset.nodes)
+        .enter()
+        .append("circle")
+        .attr("r",20)
+        .style("fill", function (data,index){
+            return colors(index);
+        })
+        .call(force.drag);
 
+      //Tooltips
+      nodes.append("title")
+        .text(function(data){
+          return data.name;
+        });
 
-        var svg = d3.select("body")
-                .append("svg")
-                .attr("width", width)
-                .attr("height", height)
+      //Every time the simulation "ticks", this will be called
+      force.on("tick", function() {
+          edges.attr("x1",function(data) { return data.source.x; })
+               .attr("y1",function(data) { return data.source.y; })
+               .attr("x2",function(data) { return data.source.x; })
+               .attr("y2",function(data) { return data.source.y; });
 
-
-        //d3 bars
-        var bar =
-                d3.select("svg")
-                        .selectAll("rect")
-                        .data(dataset)
-                        .enter()
-                        .append("rect")
-                        .attr("class", "bar")
-                        .attr("height", function (data , index) {
-                            // console.log ( data ) ;
-                            // return data.Rating * scale_multiplier;
-                            console.log("data.Rating "+index+": " +data.Rating);
-                            console.log("yScale(data.Rating) "+index+": " +yScale(data.Rating));
-                            console.log("height - yScale(data.Rating)-offset "+index+": " +(height - yScale(data.Rating)-offset));
-                            return height - yScale(data.Rating) - offset;
-
-                        })
-                        .attr("width", function () {
-                            return ( width / dataset.length ) - bar_padding;
-                        })
-                        .attr("fill", "purple")// FIXME: change to something else
-                        .attr("x", function (data, index) {
-                            return index * (width / (dataset.length) );
-                        })
-                        .attr("y", function (data) {
-                            // return height - (data.Rating * scale_multiplier) - (offset);
-                            // return yScale(data.Rating) - offset - (height - offset);
-                            return (height-offset) - (height - yScale(data.Rating) - offset);
-                        })
-
-
-        //text lb
-        svg.selectAll("text")
-                .data(dataset)
-                .enter()
-                .append("text")
-                .text(function (data) {
-                    return data.Rating
-                })
-                .attr("fill", "white")
-                .attr("font-family", "sans-serif")
-                .attr("font-size", "6px")
-                .attr("x", function (data, index) {
-                    return index * (width / dataset.length) + text_padding;
-                })
-                .attr("y", function (data) {
-                    return height - (data.Rating * scale_multiplier) + text_padding;
-                })
-                .attr("text-anchor", "middle");
-
-
-        //bar name lables
-        // svg.select("text")
-        //         .data(dataset)
-        //         .append("text")
-        //         .text(function (data) {
-        //             return data.Bar
-        //         })
-        //         .attr("fill","black")
-        //         .attr("font-family","sans-serif")
-        //         .attr("font-size","10px")
-        //         .attr("transform","rotate(45)")
-        // //x axis
-        // var xAxis = d3.svg.axis()
-        //         .scale(xScale)
-        //         .orient("bottom") ;
-        //
-        // svg.append("g")
-        //         .attr("class", "axis")
-        //         .attr("transform","translate(0,"+ (height-padding)+")")
-        //         .call(xAxis);
-        var yAxis = d3.svg.axis()
-                .scale(yScale)
-                .orient("left")
-                .ticks(11);
-
-        svg.append("g")
-                .attr("class","axis")
-                .attr("transform","translate("+ padding + ",0)")
-                .call(yAxis);
-
-        // SRB: the curly brace below was not in the correct place, and therefore the axis was not showing up.
-    }
-        //y axis
+          nodes.attr("cx", function(data) {return data.x })
+               .attr("cy", function(data) {return data.y});
+      });
 
 
+      </script>
 
-        </script>
+
+    <p id="footer">
+      Gleaners is a conversation club based in NYC.<br/>
+      Learn more at <a href="http://glnrs.tumblr.com/mission">glnrs.tumblr.com</a>
+
+    </p>
     </body>
 </html>
+
+
+
+
+<!-- Meetings Icon  -->
+<!-- <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+width="22.706px" height="19.82px" viewBox="0 0 22.706 19.82" enable-background="new 0 0 22.706 19.82" xml:space="preserve">
+<g>
+<polygon fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" points="0.43,19.564 11.089,0.5 22.27,19.263
+"/>
+</g>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.25" stroke-miterlimit="10" x1="11.023" y1="0.686" x2="10.963" y2="12.849"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.25" stroke-miterlimit="10" x1="0.644" y1="19.322" x2="10.902" y2="12.705"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.25" stroke-miterlimit="10" x1="10.902" y1="12.705" x2="22.147" y2="19.322"/>
+</svg> -->
+
+
+<!-- Full Map Icon -->
+<!-- <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="21.863px" height="21.815px" viewBox="0 0 21.863 21.815" enable-background="new 0 0 21.863 21.815" xml:space="preserve">
+<g>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="9.509" y1="21.301" x2="17.811" y2="11.833"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="9.509" y1="21.301" x2="11.096" y2="10.783"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="9.509" y1="21.301" x2="4.592" y2="9.419"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="4.34" y1="19.056" x2="9.838" y2="16.973"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="4.34" y1="19.056" x2="11.096" y2="10.783"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="2.4" y1="16.977" x2="7.844" y2="6.377"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="1.091" y1="14.453" x2="11.096" y2="10.783"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="0.512" y1="11.668" x2="14.034" y2="7.006"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="0.707" y1="8.831" x2="4.592" y2="9.419"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="1.659" y1="6.151" x2="14.034" y2="7.006"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="3.299" y1="3.828" x2="7.004" y2="12.567"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="5.505" y1="2.033" x2="13.51" y2="14.141"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="8.114" y1="0.9" x2="7.004" y2="12.567"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="10.931" y1="0.513" x2="17.811" y2="11.833"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="13.749" y1="0.9" x2="7.844" y2="6.377"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="16.358" y1="2.033" x2="4.592" y2="9.419"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="18.563" y1="3.828" x2="13.51" y2="14.141"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="20.204" y1="6.151" x2="17.811" y2="11.833"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="21.157" y1="8.831" x2="11.096" y2="10.783"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="21.35" y1="11.668" x2="11.096" y2="10.783"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="20.772" y1="14.453" x2="13.51" y2="14.141"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="20.772" y1="14.453" x2="17.811" y2="11.833"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="19.463" y1="16.978" x2="14.034" y2="7.006"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="17.522" y1="19.057" x2="10.677" y2="3.544"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="14.941" y1="20.319" x2="7.004" y2="12.567"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="12.354" y1="21.301" x2="9.838" y2="16.973"/>
+
+		<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="15.092" y1="20.534" x2="13.51" y2="14.141"/>
+	<line opacity="0.3" stroke="#000000" stroke-width="0.25" stroke-miterlimit="10" x1="6.771" y1="20.534" x2="4.592" y2="9.419"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="10.677" cy="3.544" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="7.005" cy="12.566" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="14.034" cy="7.006" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="13.51" cy="14.14" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="7.844" cy="6.377" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="9.837" cy="16.973" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="11.097" cy="10.783" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="17.811" cy="11.832" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="4.592" cy="9.419" r="0.325"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="10.932" cy="0.513" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="8.114" cy="0.9" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="5.505" cy="2.033" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="3.3" cy="3.828" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="1.659" cy="6.151" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="0.707" cy="8.831" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="0.513" cy="11.668" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="1.091" cy="14.453" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="2.4" cy="16.978" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="4.341" cy="19.056" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="6.771" cy="20.534" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="9.509" cy="21.301" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="12.354" cy="21.3" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="15.092" cy="20.534" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="17.521" cy="19.056" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="19.463" cy="16.978" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="20.771" cy="14.453" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="21.35" cy="11.667" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="21.155" cy="8.831" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="20.203" cy="6.151" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="18.563" cy="3.828" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="16.357" cy="2.033" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="13.749" cy="0.9" r="0.263"/>
+	<circle stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" cx="10.931" cy="0.513" r="0.263"/>
+</g>
+</svg> -->
+
+
+<!-- Potluck Icon -->
+<!--
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="21.455px" height="22.38px" viewBox="0 0 21.455 22.38" enable-background="new 0 0 21.455 22.38" xml:space="preserve">
+<g opacity="0.79">
+	<polygon opacity="0.81" fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" points="0.935,17.979
+		7.925,0.495 19.574,15.292 	"/>
+	<polygon fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" points="3.095,2.641 6.886,21.087 20.965,8.581
+		"/>
+	<polygon opacity="0.81" fill="none" stroke="#000000" stroke-width="0.5" stroke-miterlimit="10" points="19.049,4.263
+		0.468,7.329 12.414,21.887 	"/>
+</g>
+<line opacity="0.9" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="6.933" y1="20.825" x2="9.574" y2="11.036"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.574" y1="11.128" x2="7.935" y2="0.794"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.574" y1="11.128" x2="18.727" y2="4.437"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.574" y1="11.128" x2="19.271" y2="15.181"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.574" y1="11.128" x2="0.935" y2="17.979"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.574" y1="11.128" x2="0.923" y2="7.486"/>
+<line opacity="0.9" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.71" y1="11.083" x2="3.292" y2="2.797"/>
+<line opacity="0.9" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.574" y1="11.036" x2="20.729" y2="8.761"/>
+<line opacity="0.7" fill="none" stroke="#4D4D4D" stroke-width="0.15" stroke-miterlimit="10" x1="9.574" y1="11.128" x2="12.307" y2="21.6"/>
+</svg> -->

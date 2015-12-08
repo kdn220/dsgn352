@@ -1,0 +1,60 @@
+
+/*text*/
+*{
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
+a:link{
+  color: black;
+  text-decoration: none;
+}
+
+ul{
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+a:hover{
+  color:#993333;
+}
+
+p {
+  font: 15px Arial
+}
+h1 {
+  font: 45px Arial
+}
+body{
+  font: 15px Arial
+}
+svg {
+  display:inline;
+  background-color:white;
+  margin-left: 300px;
+  padding: 100px;
+  border-style: solid;
+  border-width: thin;
+  border-color: black;
+
+}
+
+
+#title {
+  line-height:1;
+}
+#footer {
+  text-align: right;
+}
+
+#nav{
+  font-size: 20px;
+  margin-bottom: 30px;
+
+}
+/*viz*/
+
+svg {
+  background-color: white;
+}
