@@ -21,14 +21,15 @@ a:hover{
 }
 
 p {
-  font: 15px Arial
+  font: 15px Arial ;
 }
 h1 {
-  font: 45px Arial
+  font: 45px Arial ;
+  float: left ;
 
 }
 body{
-  font: 15px Arial
+  font: 15px Arial ;
 }
 
 svg {
@@ -52,12 +53,14 @@ svg {
 #header {
   width:250;
   margin: auto;
+  float: left ;
 }
 
 #nav{
   font-size: 20px;
   margin-bottom: 30px;
-
+  float: left ;
+  clear: left ;
 }
 
 
@@ -81,4 +84,8 @@ circle.active {
 
 path.active {
   stroke: gray;
+}
+
+#nav li a {
+  font-size: 1em ;
 }
