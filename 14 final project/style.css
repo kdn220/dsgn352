@@ -25,21 +25,22 @@ p {
 }
 h1 {
   font: 45px Arial
+
 }
 body{
   font: 15px Arial
 }
+
 svg {
   display:inline;
   background-color:white;
-  margin-left: 300px;
-  padding: 100px;
+  margin-left: 400px;
+  padding: 130px;
   border-style: solid;
   border-width: thin;
   border-color: black;
 
 }
-
 
 #title {
   line-height:1;
@@ -48,13 +49,36 @@ svg {
   text-align: right;
 }
 
+#header {
+  width:250;
+  margin: auto;
+}
+
 #nav{
   font-size: 20px;
   margin-bottom: 30px;
 
 }
+
+
 /*viz*/
 
-svg {
-  background-color: white;
+.node {
+  fill : lightgray;
+  stroke: black;
+  stroke-width: 1px;
+}
+
+.link {
+  stroke: gray;
+}
+
+
+circle.active {
+  outline-style: solid;
+  outline-color: red;
+}
+
+path.active {
+  stroke: gray;
 }

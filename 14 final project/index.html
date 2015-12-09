@@ -1,3 +1,7 @@
+<!-- TODO
+• Link Icon to nav
+• Dynamic nav with javascript-->
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,7 +10,10 @@
           <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
           <link rel="stylesheet" type="text/css" href="style.css">
     </head>
-    <h1 id="title">Gleaners<br/>Archive</h1>
+    <div id="header">
+      <h1 id="title">Gleaners<br/>Archive</h1>
+      <img src="meeting.svg" alt="Meetings" width="5%">
+    </div>
     <body>
         <ul id="nav">
         <li><a href="index.html">Meetings</a></li>
@@ -25,32 +32,32 @@
       //Data
       var dataset = {
         nodes: [
-          { name : "Jim" },
-          { name : "Andrew" },
-          { name : "Katie" },
-          { name : "Alison" },
-          { name : "Ross" },
-          { name : "Gabriel" },
-          { name : "Jon S" },
-          { name : "Insia" },
-          { name : "Emily" },
-          { name : "Kris" }
+          { name : "Jim"},
+          { name : "Andrew"},
+          { name : "Meeting 1"}
+          // { name : "Katie" },
+          // { name : "Alison" },
+          // { name : "Ross" },
+          // { name : "Gabriel" },
+          // { name : "Jon S" },
+          // { name : "Insia" },
+          // { name : "Emily" },
+          // { name : "Kris" }
         ],
         edges: [
           { source: 0, target: 1},
           { source: 0, target: 2},
-          { source: 0, target: 3},
-          { source: 3, target: 4},
-          { source: 3, target: 5},
-          { source: 3, target: 6},
-          { source: 7, target: 8},
-          { source: 7, target: 9},
-          { source: 9, target: 1},
-          { source: 9, target: 2},
-          { source: 9, target: 3},
-          { source: 9, target: 4},
-          { source: 9, target: 5},
-          { source: 9, target: 6},
+          // { source: 3, target: 4},
+          // { source: 3, target: 5},
+          // { source: 3, target: 6},
+          // { source: 7, target: 8},
+          // { source: 7, target: 9},
+          // { source: 9, target: 1},
+          // { source: 9, target: 2},
+          // { source: 9, target: 3},
+          // { source: 9, target: 4},
+          // { source: 9, target: 5},
+          // { source: 9, target: 6},
         ]
       };
 
@@ -59,7 +66,7 @@
         .nodes(dataset.nodes)
         .links(dataset.edges)
         .size([w,h])
-        .linkDistance([100])
+        .linkDistance([200])
         .charge([-600])
         .start();
 
@@ -72,12 +79,14 @@
         .attr("width",w)
         .attr("height",h);
 
+
       //create edges as lines
-      var edges = svg.selectAll("line")
+      var edges = svg.selectAll(".edges")
         .data(dataset.edges)
         .enter()
         .append("line")
-        .style("stroke","#ccc")
+        .attr("class","link")
+        .style("stroke","#a3a3a3")
         .style("stroke-width",2);
 
       //create nodes as circles
@@ -85,14 +94,15 @@
         .data(dataset.nodes)
         .enter()
         .append("circle")
-        .attr("r",20)
+        .attr("r",25)
         .style("fill", function (data,index){
             return colors(index);
         })
         .call(force.drag);
 
+
       //Tooltips
-      nodes.append("title")
+      nodes.append("name")
         .text(function(data){
           return data.name;
         });
