@@ -6,7 +6,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>d3 bar chart</title>
+        <title>Gleaners Archive</title>
           <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
           <link rel="stylesheet" type="text/css" href="style.css">
     </head>
@@ -24,8 +24,8 @@
 
       <script type="text/javascript">
       //
-      var w = 1000;
-      var h = 800;
+      var width = 1000;
+      var height = 800;
 
       //Data
       var dataset = {
@@ -63,7 +63,7 @@
       var force = d3.layout.force()
         .nodes(dataset.nodes)
         .links(dataset.edges)
-        .size([w,h])
+        .size([width,height])
         .linkDistance([200])
         .charge([-600])
         .start();
@@ -74,8 +74,8 @@
       //create SVG element
       var svg = d3.select("body")
         .append("svg")
-        .attr("width",w)
-        .attr("height",h);
+        .attr("width",width)
+        .attr("height",height);
 
 
       //create edges as lines
@@ -93,9 +93,10 @@
         .enter()
         .append("circle")
         .attr("r",25)
-        .style("fill", function (data,index){
-            return colors(index);
-        })
+        .attr("class","node")
+        // .style("fill", function (data,index){
+        //     return colors(index);
+        // })
         .call(force.drag);
 
 

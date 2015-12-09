@@ -69,7 +69,7 @@ svg {
 .node {
   fill : lightgray;
   stroke: black;
-  stroke-width: 1px;
+  stroke-width: 8px;
 }
 
 .link {
