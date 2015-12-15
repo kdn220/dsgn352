@@ -33,13 +33,13 @@ body{
 }
 
 svg {
-  display:inline;
+  /*display:inline;*/
   background-color:white;
   margin-left: 400px;
   padding: 130px;
-  border-style: solid;
-  border-width: thin;
-  border-color: black;
+  /*border-style: solid;*/
+  /*border-width: thin;*/
+  /*border-color: black;*/
 
 }
 
@@ -53,7 +53,8 @@ svg {
 #header {
   width:250;
   margin: auto;
-  float: left ;
+  float: left;
+  clear: left;
 }
 
 #nav{
@@ -63,17 +64,21 @@ svg {
   clear: left ;
 }
 
+#home{
+  font-size: 15px;
+  margin-top:30px;
+}
 
 /*viz*/
 
 .node {
   fill : lightgray;
   stroke: black;
-  stroke-width: 8px;
+  stroke-width: 1px;
 }
 
 .link {
-  stroke: gray;
+  stroke: black;
 }
 
 

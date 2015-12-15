@@ -16,16 +16,16 @@
     </div>
     <body>
         <ul id="nav">
-        <li><a href="index.html">Meetings</a></li>
-        <li><a href="#">Potlucks</a></li>
-        <li><a href="#">Stories</a></li>
-            <li><a href="#">Home</a></li>
-      </ul>
+          <li><a href="index.html">Meetings</a></li>
+          <li><a href="#">Potlucks</a></li>
+          <li><a href="#">Stories</a></li>
+          <li id="home"><a href="#">Home</a></li>
+        </ul>
 
       <script type="text/javascript">
       //
       var width = 1000;
-      var height = 800;
+      var height = 300;
 
       //Data
       var dataset = {
@@ -44,7 +44,7 @@
         ],
         edges: [
           { source: 0, target: 1},
-          { source: 0, target: 2},
+          { source: 0, target: 2}
           // { source: 3, target: 4},
           // { source: 3, target: 5},
           // { source: 3, target: 6},
@@ -68,8 +68,7 @@
         .charge([-600])
         .start();
 
-      //Easy colors
-      var colors = d3.scale.category20();
+
 
       //create SVG element
       var svg = d3.select("body")
@@ -79,39 +78,52 @@
 
 
       //create edges as lines
-      var edges = svg.selectAll(".edges")
+      var edges = svg.selectAll("line")
         .data(dataset.edges)
         .enter()
         .append("line")
         .attr("class","link")
-        .style("stroke","#a3a3a3")
-        .style("stroke-width",2);
+        .style("stroke","black")
+        .style("stroke-width",1);
 
       //create nodes as circles
       var nodes = svg.selectAll("circle")
         .data(dataset.nodes)
         .enter()
         .append("circle")
-        .attr("r",25)
+        .attr("r",30)
         .attr("class","node")
         // .style("fill", function (data,index){
         //     return colors(index);
         // })
         .call(force.drag);
 
+      // create lables
+      // var labels = svg.selectAll("text")
+      //   .data(dataset.nodes)
+      //   .enter()
+      //   .append("text")
+      //   .text(function(data) {;
+      //   })
+      //   .attr("x",100)
+      //   .attr("y", 100)
+      //   .attr("font-family","sans-serif")
+      //   .attr("font-size","11px")
+      //   .attr("fill","red");
+
 
       //Tooltips
       nodes.append("name")
         .text(function(data){
-          return data.name;
+          return name;
         });
 
       //Every time the simulation "ticks", this will be called
       force.on("tick", function() {
           edges.attr("x1",function(data) { return data.source.x; })
                .attr("y1",function(data) { return data.source.y; })
-               .attr("x2",function(data) { return data.source.x; })
-               .attr("y2",function(data) { return data.source.y; });
+               .attr("x2",function(data) { return data.target.x; })
+               .attr("y2",function(data) { return data.target.y; });
 
           nodes.attr("cx", function(data) {return data.x })
                .attr("cy", function(data) {return data.y});
@@ -123,7 +135,10 @@
 
     <p id="footer">
       Gleaners is a conversation club based in NYC.<br/>
-      Learn more at <a href="http://glnrs.tumblr.com/mission">glnrs.tumblr.com</a>
+      Learn more at<a href="http://glnrs.tumblr.com/mission">glnrs.tumblr.com</a>
+      <!-- </br>
+      Prototype <a href="prototype.html">here</a>.  -->
+
 
     </p>
     </body>
